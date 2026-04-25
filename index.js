@@ -59,14 +59,18 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/safecity_db';
 
-mongoose.connect(MONGODB_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+// Start Server First (So Render knows we are alive)
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server is officially live on port ${PORT}`);
+  
+  // Connect to Database in the background
+  mongoose.connect(MONGODB_URI)
+    .then(() => console.log('✅ Connected to MongoDB Atlas'))
+    .catch(err => {
+      console.error('❌ MongoDB connection error:', err);
+      // Don't kill the process, just log it so we can debug
     });
-  })
-  .catch(err => console.error('MongoDB connection error:', err));
+});
 
 // Global Error Handlers for Stability
 process.on('unhandledRejection', (err) => {
