@@ -46,6 +46,11 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/admin-tools', adminToolsRoutes);
 app.use('/api/collaboration', collaborationRoutes);
 
+// Root Health Check
+app.get('/', (req, res) => {
+  res.send('<h1>🚀 SafeCity API is LIVE</h1><p>Status: Healthy</p>');
+});
+
 
 
 
