@@ -9,6 +9,7 @@ const AlertSchema = new mongoose.Schema({
     lat: { type: Number, required: true },
     lng: { type: Number, required: true }
   },
+  state: { type: String, required: true },
   mediaUrls: [{ type: String }], // URLs for photos/videos/voice notes
   triageLevel: { type: Number, min: 1, max: 5, default: 3 }, // 1: Low, 5: Critical
   triageResponses: [{ question: String, answer: String }],

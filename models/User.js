@@ -8,6 +8,8 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, enum: ['admin', 'department'], required: true },
   departmentType: { type: String, enum: ['police', 'fire', 'ambulance', 'other', 'none'], default: 'none' },
   address: { type: String, required: true, default: 'Address Not Provided' },
+  state: { type: String, required: true }, 
+  city: { type: String, required: true },   
   phone: { type: String, default: '' },
   description: { type: String, default: 'Official SafeCity Department' },
   profileImage: { type: String, default: '' },
