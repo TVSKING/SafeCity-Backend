@@ -49,34 +49,36 @@ exports.getAdminAlerts = async (req, res) => {
 exports.getDepartmentAlerts = async (req, res) => {
   try {
     const { deptType } = req.query;
-    const userState = req.user ? req.user.state : null;
+    const userState = req.user && req.user.state ? req.user.state.trim() : null;
     
-    console.log(`🔍 FETCHING ALERTS | Dept: ${deptType} | Station State: ${userState}`);
+    console.log(`🔍 FETCHING ALERTS | Dept: ${deptType} | Station State: "${userState}"`);
 
-    // STRICT CHECK: If department user has no state, they see NOTHING.
     if (!userState) {
       console.log('⚠️ REJECTED: Station has no state assigned in profile');
       return res.json([]);
     }
 
+    // Create a case-insensitive regex for the state to avoid mismatch
+    const stateRegex = new RegExp(`^${userState}$`, 'i');
+
     let query = { 
-      assignedDepartment: deptType,
-      state: userState // Force the state filter on every query
+      state: stateRegex,
+      assignedDepartment: deptType
     };
 
     if (deptType === 'police') {
       query = { 
-        state: userState,
+        state: stateRegex,
         $or: [{ assignedDepartment: 'police' }, { type: 'Crime' }, { type: 'Accident' }, { type: 'SOS' }] 
       };
     } else if (deptType === 'fire') {
       query = { 
-        state: userState,
+        state: stateRegex,
         $or: [{ assignedDepartment: 'fire' }, { type: 'Fire' }, { type: 'SOS' }] 
       };
     } else if (deptType === 'ambulance') {
       query = { 
-        state: userState,
+        state: stateRegex,
         $or: [{ assignedDepartment: 'ambulance' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }] 
       };
     }
