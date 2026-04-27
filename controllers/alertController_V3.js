@@ -75,6 +75,8 @@ exports.getDepartmentAlerts = async (req, res) => {
       query.$or = [{ assignedDepartment: 'fire' }, { type: 'Fire' }, { type: 'SOS' }];
     } else if (deptType === 'ambulance' || deptType === 'medical') {
       query.$or = [{ assignedDepartment: 'ambulance' }, { assignedDepartment: 'medical' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }];
+    } else if (deptType === 'all') {
+      // Do not add department filter, show everything in state
     } else {
       query.assignedDepartment = deptType;
     }
