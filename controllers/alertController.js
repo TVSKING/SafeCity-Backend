@@ -3,6 +3,7 @@ const Alert = require('../models/Alert');
 exports.createAlert = async (req, res) => {
   try {
     const { reporterName, reporterPhone, type, description, location, state, triageLevel, triageResponses } = req.body;
+    console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${type}`);
     let assignedDepartment = 'none';
 
     if (type === 'Fire') assignedDepartment = 'fire';
@@ -50,8 +51,11 @@ exports.getDepartmentAlerts = async (req, res) => {
     const { deptType } = req.query;
     const userState = req.user ? req.user.state : null;
     
+    console.log(`🔍 FETCHING ALERTS | Dept: ${deptType} | Station State: ${userState}`);
+
     // STRICT CHECK: If department user has no state, they see NOTHING.
     if (!userState) {
+      console.log('⚠️ REJECTED: Station has no state assigned in profile');
       return res.json([]);
     }
 
