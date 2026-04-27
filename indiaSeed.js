@@ -68,7 +68,7 @@ const cities = [
 const seedShortIndia = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/safecity_db');
-    console.log('Connected to MongoDB. Starting Shortened Nationwide Seed...');
+    console.log('Connected to MongoDB. Re-seeding with correct state/city fields...');
 
     // Clean up first
     await User.deleteMany({ role: 'department' });
@@ -83,7 +83,6 @@ const seedShortIndia = async () => {
         { label: 'Hospital', type: 'ambulance' }
       ];
 
-      // Create a short prefix (e.g., Visakhapatnam -> visa, Rajkot -> rajk)
       const prefix = city.name.substring(0, 4).toLowerCase();
 
       for (const t of types) {
@@ -97,6 +96,8 @@ const seedShortIndia = async () => {
           role: 'department',
           departmentType: t.type,
           address: `${cleanName} HQ, ${city.name}, ${city.state}`,
+          state: city.state, // IMPORTANT: Added this
+          city: city.name,   // IMPORTANT: Added this
           phone: '100',
           isActive: true
         };
@@ -109,11 +110,10 @@ const seedShortIndia = async () => {
         });
         
         credentialsText += `City: ${city.name} (${city.state}) | Dept: ${t.label}\nEmail: ${userData.email}\nPassword: ${userData.password}\n--------------------------------\n`;
-        console.log(`✅ Created: ${newUser.name} (${userData.email})`);
+        console.log(`✅ Created: ${newUser.name} with State: ${city.state}`);
       }
     }
 
-    // Write file outside the project folder (Hackathon folder)
     const filePath = path.join(__dirname, '..', '..', 'city_credentials.txt');
     fs.writeFileSync(filePath, credentialsText);
     console.log(`\n📄 Credentials saved to: ${filePath}`);
