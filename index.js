@@ -65,6 +65,7 @@ app.get('/', async (req, res) => {
           <p style="font-size: 24px; font-weight: 900; color: #dc2626; margin: 8px 0;">${alertCount} Records</p>
         </div>
       </div>
+      <p style="margin-top: 40px; font-family: monospace; color: #94a3b8; font-size: 12px;">Protocol Version: v2.5.1-FINAL-SYNC</p>
     </div>
   `);
 });
