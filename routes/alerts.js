@@ -7,5 +7,6 @@ router.get('/admin', alertController.getAdminAlerts);
 router.get('/department', alertController.getDepartmentAlerts);
 router.put('/update/:id', alertController.updateAlertStatus);
 router.put('/assign', alertController.assignAlert);
+router.get('/debug-db', alertController.debugDB);
 
 module.exports = router;

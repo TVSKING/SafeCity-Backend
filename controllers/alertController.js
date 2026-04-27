@@ -88,6 +88,25 @@ exports.getDepartmentAlerts = async (req, res) => {
   }
 };
 
+exports.debugDB = async (req, res) => {
+  try {
+    const dbName = mongoose.connection.name;
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    const userCount = await mongoose.model('User').countDocuments({});
+    const alertCount = await mongoose.model('Alert').countDocuments({});
+    
+    res.json({
+      activeDatabase: dbName,
+      collections: collections.map(c => c.name),
+      userCount,
+      alertCount,
+      connectionStatus: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.updateAlertStatus = async (req, res) => {
   try {
     const { id } = req.params;
