@@ -1,4 +1,5 @@
 const Alert = require('../models/Alert');
+const mongoose = require('mongoose');
 
 exports.createAlert = async (req, res) => {
   try {
@@ -49,6 +50,9 @@ exports.getAdminAlerts = async (req, res) => {
 exports.getDepartmentAlerts = async (req, res) => {
   try {
     const deptType = req.query.deptType ? req.query.deptType.toLowerCase() : null;
+    
+    console.log(`🔐 AUTH VERIFIED | User: ${req.user?.email} | State: ${req.user?.state}`);
+    
     const userState = req.user && req.user.state ? req.user.state.trim() : null;
     
     if (!userState) {
