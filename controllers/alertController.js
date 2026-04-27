@@ -48,7 +48,7 @@ exports.getAdminAlerts = async (req, res) => {
 
 exports.getDepartmentAlerts = async (req, res) => {
   try {
-    const { deptType } = req.query;
+    const deptType = req.query.deptType ? req.query.deptType.toLowerCase() : null;
     const userState = req.user && req.user.state ? req.user.state.trim() : null;
     
     console.log(`🔍 FETCHING ALERTS | Dept: ${deptType} | Station State: "${userState}"`);
@@ -58,7 +58,6 @@ exports.getDepartmentAlerts = async (req, res) => {
       return res.json([]);
     }
 
-    // Create a case-insensitive regex for the state to avoid mismatch
     const stateRegex = new RegExp(`^${userState}$`, 'i');
 
     let query = { 
@@ -76,10 +75,10 @@ exports.getDepartmentAlerts = async (req, res) => {
         state: stateRegex,
         $or: [{ assignedDepartment: 'fire' }, { type: 'Fire' }, { type: 'SOS' }] 
       };
-    } else if (deptType === 'ambulance') {
+    } else if (deptType === 'ambulance' || deptType === 'medical') {
       query = { 
         state: stateRegex,
-        $or: [{ assignedDepartment: 'ambulance' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }] 
+        $or: [{ assignedDepartment: 'ambulance' }, { assignedDepartment: 'medical' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }] 
       };
     }
 
