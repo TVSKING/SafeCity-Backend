@@ -51,38 +51,30 @@ exports.getDepartmentAlerts = async (req, res) => {
     const deptType = req.query.deptType ? req.query.deptType.toLowerCase() : null;
     const userState = req.user && req.user.state ? req.user.state.trim() : null;
     
-    console.log(`🔍 FETCHING ALERTS | Dept: ${deptType} | Station State: "${userState}"`);
-
     if (!userState) {
-      console.log('⚠️ REJECTED: Station has no state assigned in profile');
+      console.log(`⚠️ REJECTED | User: ${req.user ? req.user.name : 'Unknown'} | Reason: No state assigned`);
       return res.json([]);
     }
 
-    const stateRegex = new RegExp(`^${userState}$`, 'i');
-
+    // Direct case-insensitive match
     let query = { 
-      state: stateRegex,
-      assignedDepartment: deptType
+      state: { $regex: new RegExp(`^${userState}$`, 'i') }
     };
 
     if (deptType === 'police') {
-      query = { 
-        state: stateRegex,
-        $or: [{ assignedDepartment: 'police' }, { type: 'Crime' }, { type: 'Accident' }, { type: 'SOS' }] 
-      };
+      query.$or = [{ assignedDepartment: 'police' }, { type: 'Crime' }, { type: 'Accident' }, { type: 'SOS' }];
     } else if (deptType === 'fire') {
-      query = { 
-        state: stateRegex,
-        $or: [{ assignedDepartment: 'fire' }, { type: 'Fire' }, { type: 'SOS' }] 
-      };
+      query.$or = [{ assignedDepartment: 'fire' }, { type: 'Fire' }, { type: 'SOS' }];
     } else if (deptType === 'ambulance' || deptType === 'medical') {
-      query = { 
-        state: stateRegex,
-        $or: [{ assignedDepartment: 'ambulance' }, { assignedDepartment: 'medical' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }] 
-      };
+      query.$or = [{ assignedDepartment: 'ambulance' }, { assignedDepartment: 'medical' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }];
+    } else {
+      query.assignedDepartment = deptType;
     }
 
+    console.log(`🔍 DB QUERY: ${JSON.stringify(query)}`);
+
     const alerts = await Alert.find(query).sort({ createdAt: -1 });
+    console.log(`✅ FOUND: ${alerts.length} alerts for ${userState}`);
     res.json(alerts);
   } catch (error) {
     res.status(500).json({ message: error.message });
