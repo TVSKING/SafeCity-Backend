@@ -56,9 +56,9 @@ exports.getDepartmentAlerts = async (req, res) => {
       return res.json([]);
     }
 
-    // Direct case-insensitive match
+    // DIRECT STRING MATCH (Most reliable)
     let query = { 
-      state: { $regex: new RegExp(`^${userState}$`, 'i') }
+      state: userState
     };
 
     if (deptType === 'police') {
