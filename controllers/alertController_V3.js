@@ -4,19 +4,23 @@ const mongoose = require('mongoose');
 exports.createAlert = async (req, res) => {
   try {
     const { reporterName, reporterPhone, type, description, location, state, triageLevel, triageResponses } = req.body;
-    console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${type}`);
+    
+    // Normalize type to Capitalized Case (e.g., 'fire' -> 'Fire')
+    const normalizedType = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    
+    console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${normalizedType}`);
     let assignedDepartment = 'none';
 
-    if (type === 'Fire') assignedDepartment = 'fire';
-    else if (type === 'Medical') assignedDepartment = 'ambulance';
-    else if (type === 'Crime') assignedDepartment = 'police';
-    else if (type === 'Accident') assignedDepartment = 'police';
-    else if (type === 'SOS') assignedDepartment = 'none'; // SOS often needs multi-dept or manual assignment
+    if (normalizedType === 'Fire') assignedDepartment = 'fire';
+    else if (normalizedType === 'Medical') assignedDepartment = 'ambulance';
+    else if (normalizedType === 'Crime') assignedDepartment = 'police';
+    else if (normalizedType === 'Accident') assignedDepartment = 'police';
+    else if (normalizedType === 'SOS') assignedDepartment = 'none';
 
     const alert = new Alert({
       reporterName,
       reporterPhone,
-      type,
+      type: normalizedType,
       description,
       location,
       triageLevel,

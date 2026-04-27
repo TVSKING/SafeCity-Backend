@@ -3,7 +3,7 @@ const router = express.Router();
 const alertController = require('../controllers/alertController_V3');
 const { protect } = require('../middleware/authMiddleware');
 
-router.post('/create', protect, alertController.createAlert);
+router.post('/create', alertController.createAlert);
 router.get('/admin', protect, alertController.getAdminAlerts);
 router.get('/department', protect, alertController.getDepartmentAlerts);
 router.put('/update/:id', alertController.updateAlertStatus);
