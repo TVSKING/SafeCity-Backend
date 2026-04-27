@@ -76,7 +76,13 @@ exports.getDepartmentAlerts = async (req, res) => {
 
     const alerts = await Alert.find(query).sort({ createdAt: -1 });
     console.log(`✅ FOUND: ${alerts.length} matching alerts`);
-    res.json(alerts);
+    
+    // Return both the alerts and the total count for debugging
+    res.json({
+      alerts,
+      totalInDb,
+      appliedQuery: query
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
