@@ -81,7 +81,9 @@ exports.getDepartmentAlerts = async (req, res) => {
     res.json({
       alerts,
       totalInDb,
-      appliedQuery: query
+      appliedQuery: query,
+      dbHost: mongoose.connection.host,
+      dbName: mongoose.connection.name
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
