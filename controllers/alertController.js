@@ -56,9 +56,9 @@ exports.getDepartmentAlerts = async (req, res) => {
       return res.json([]);
     }
 
-    // DIRECT STRING MATCH (Most reliable)
+    // LOOSE MATCH (Handles hidden spaces/characters)
     let query = { 
-      state: userState
+      state: { $regex: userState, $options: 'i' }
     };
 
     if (deptType === 'police') {
@@ -71,10 +71,11 @@ exports.getDepartmentAlerts = async (req, res) => {
       query.assignedDepartment = deptType;
     }
 
-    console.log(`🔍 DB QUERY: ${JSON.stringify(query)}`);
+    const totalInDb = await Alert.countDocuments({});
+    console.log(`📊 DATABASE STATUS | Total Alerts in DB: ${totalInDb} | Query: ${JSON.stringify(query)}`);
 
     const alerts = await Alert.find(query).sort({ createdAt: -1 });
-    console.log(`✅ FOUND: ${alerts.length} alerts for ${userState}`);
+    console.log(`✅ FOUND: ${alerts.length} matching alerts`);
     res.json(alerts);
   } catch (error) {
     res.status(500).json({ message: error.message });
