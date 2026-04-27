@@ -50,18 +50,31 @@ exports.getDepartmentAlerts = async (req, res) => {
     const { deptType } = req.query;
     const userState = req.user ? req.user.state : null;
     
-    let query = { assignedDepartment: deptType };
-    
-    if (userState) {
-      query.state = userState;
+    // STRICT CHECK: If department user has no state, they see NOTHING.
+    if (!userState) {
+      return res.json([]);
     }
 
+    let query = { 
+      assignedDepartment: deptType,
+      state: userState // Force the state filter on every query
+    };
+
     if (deptType === 'police') {
-      query = { ...query, $or: [{ assignedDepartment: 'police' }, { type: 'Crime' }, { type: 'Accident' }] };
+      query = { 
+        state: userState,
+        $or: [{ assignedDepartment: 'police' }, { type: 'Crime' }, { type: 'Accident' }, { type: 'SOS' }] 
+      };
     } else if (deptType === 'fire') {
-      query = { ...query, $or: [{ assignedDepartment: 'fire' }, { type: 'Fire' }] };
+      query = { 
+        state: userState,
+        $or: [{ assignedDepartment: 'fire' }, { type: 'Fire' }, { type: 'SOS' }] 
+      };
     } else if (deptType === 'ambulance') {
-      query = { ...query, $or: [{ assignedDepartment: 'ambulance' }, { type: 'Medical' }, { type: 'Accident' }] };
+      query = { 
+        state: userState,
+        $or: [{ assignedDepartment: 'ambulance' }, { type: 'Medical' }, { type: 'Accident' }, { type: 'SOS' }] 
+      };
     }
 
     const alerts = await Alert.find(query).sort({ createdAt: -1 });
