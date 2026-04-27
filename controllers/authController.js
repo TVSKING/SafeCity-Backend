@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, state: user.state },
       process.env.JWT_SECRET || 'safecity_secret_key_2024',
       { expiresIn: '24h' }
     );
@@ -31,7 +31,9 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role,
         departmentType: user.departmentType,
-        address: user.address
+        address: user.address,
+        state: user.state,
+        city: user.city
       }
     });
   } catch (error) {
