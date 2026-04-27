@@ -47,8 +47,26 @@ app.use('/api/admin-tools', adminToolsRoutes);
 app.use('/api/collaboration', collaborationRoutes);
 
 // Root Health Check
-app.get('/', (req, res) => {
-  res.send('<h1>🚀 SafeCity API is LIVE</h1><p>Status: Healthy</p>');
+app.get('/', async (req, res) => {
+  const dbName = mongoose.connection.name;
+  const alertCount = await mongoose.model('Alert').countDocuments({});
+  res.send(`
+    <div style="font-family: sans-serif; padding: 40px; text-align: center; background: #f8fafc; min-height: 100vh;">
+      <h1 style="font-size: 48px; margin-bottom: 8px;">🚀 SafeCity API</h1>
+      <p style="color: #64748b; font-size: 20px; font-weight: 600;">Status: Healthy & Online</p>
+      <hr style="border: 1px solid #e2e8f0; margin: 40px 0; max-width: 400px; margin-left: auto; margin-right: auto;">
+      <div style="display: flex; justify-content: center; gap: 20px;">
+        <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; min-width: 200px;">
+          <p style="text-transform: uppercase; font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 2px;">Active Database</p>
+          <p style="font-size: 24px; font-weight: 900; color: #0f172a; margin: 8px 0;">${dbName}</p>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; min-width: 200px;">
+          <p style="text-transform: uppercase; font-size: 10px; font-weight: 800; color: #94a3b8; letter-spacing: 2px;">Incident Pool</p>
+          <p style="font-size: 24px; font-weight: 900; color: #dc2626; margin: 8px 0;">${alertCount} Records</p>
+        </div>
+      </div>
+    </div>
+  `);
 });
 
 
