@@ -1,37 +1,27 @@
 const Alert = require('../models/Alert');
-const { classifyEmergency } = require('../utils/triage');
 
 exports.createAlert = async (req, res) => {
   try {
-    const { reporterName, reporterPhone, type, description, location, state, triageLevel, triageResponses, media } = req.body;
-    
-    // AI Triage Integration
-    const triage = classifyEmergency(description || "");
-    const finalType = type || triage.type;
-    const finalPriority = triage.priority;
-
-    console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${finalType} | Priority: ${finalPriority}`);
-    
+    const { reporterName, reporterPhone, type, description, location, state, triageLevel, triageResponses } = req.body;
+    console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${type}`);
     let assignedDepartment = 'none';
-    const normalizedType = finalType.toLowerCase();
-    if (normalizedType === 'fire') assignedDepartment = 'fire';
-    else if (normalizedType === 'medical') assignedDepartment = 'ambulance';
-    else if (normalizedType === 'crime') assignedDepartment = 'police';
-    else if (normalizedType === 'accident') assignedDepartment = 'police';
-    else if (normalizedType === 'sos') assignedDepartment = 'none';
+
+    if (type === 'Fire') assignedDepartment = 'fire';
+    else if (type === 'Medical') assignedDepartment = 'ambulance';
+    else if (type === 'Crime') assignedDepartment = 'police';
+    else if (type === 'Accident') assignedDepartment = 'police';
+    else if (type === 'SOS') assignedDepartment = 'none'; // SOS often needs multi-dept or manual assignment
 
     const alert = new Alert({
       reporterName,
       reporterPhone,
-      type: finalType,
-      priority: finalPriority,
+      type,
       description,
       location,
       triageLevel,
       triageResponses,
       assignedDepartment,
       state, 
-      media: media || [],
       status: 'Pending'
     });
 
@@ -46,33 +36,6 @@ exports.createAlert = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-exports.getAlertAnalytics = async (req, res) => {
-  try {
-    const typeDistribution = await Alert.aggregate([
-      { $group: { _id: "$type", count: { $sum: 1 } } }
-    ]);
-
-    const statusDistribution = await Alert.aggregate([
-      { $group: { _id: "$status", count: { $sum: 1 } } }
-    ]);
-
-    // Simple response time calculation (Mocked logic based on resolved alerts)
-    const resolvedAlerts = await Alert.find({ status: 'Resolved' }).limit(100);
-    const avgResponseTime = resolvedAlerts.length > 0 ? 12 : 0; // In minutes
-
-    res.json({
-      typeDistribution,
-      statusDistribution,
-      avgResponseTime
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-exports.getAdminAlerts = async (req, res) => {
-// ... rest of the file ...
 
 exports.getAdminAlerts = async (req, res) => {
   try {

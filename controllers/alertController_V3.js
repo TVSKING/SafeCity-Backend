@@ -2,11 +2,12 @@ const Alert = require('../models/Alert');
 const mongoose = require('mongoose');
 
 exports.createAlert = async (req, res) => {
+  console.log('--- CREATE ALERT START ---');
   try {
     const { reporterName, reporterPhone, type, description, location, state, triageLevel, triageResponses } = req.body;
     
     // Normalize type to Capitalized Case (e.g., 'fire' -> 'Fire')
-    const normalizedType = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+    const normalizedType = type ? (type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()) : 'SOS';
     
     console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${normalizedType}`);
     let assignedDepartment = 'none';

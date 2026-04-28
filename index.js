@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
-const path = require('path');
 const { Server } = require('socket.io');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -46,7 +45,6 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/api/admin-tools', adminToolsRoutes);
 app.use('/api/collaboration', collaborationRoutes);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Root Health Check
 app.get('/', async (req, res) => {
@@ -77,19 +75,6 @@ app.get('/', async (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-
-  // Collab Hub - Join Room
-  socket.on('joinRoom', (roomName) => {
-    socket.join(roomName);
-    console.log(`User ${socket.id} joined room: ${roomName}`);
-  });
-
-  // Collab Hub - Send Message
-  socket.on('sendMessage', (data) => {
-    const { room, message, sender } = data;
-    io.to(room).emit('receiveMessage', { message, sender, timestamp: new Date() });
-  });
-
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });
