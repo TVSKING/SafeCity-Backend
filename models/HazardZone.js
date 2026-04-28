@@ -9,6 +9,7 @@ const HazardZoneSchema = new mongoose.Schema({
     lng: { type: Number, required: true }
   },
   radius: { type: Number, default: 500 }, // in meters
+  state: { type: String, required: true },
   isActive: { type: Boolean, default: true },
   deployedResources: [{
     resourceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Resource' },

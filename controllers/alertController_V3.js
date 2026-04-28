@@ -2,14 +2,25 @@ const Alert = require('../models/Alert');
 const mongoose = require('mongoose');
 
 exports.createAlert = async (req, res) => {
-  console.log('--- CREATE ALERT START ---');
   try {
     const { reporterName, reporterPhone, type, description, location, state, triageLevel, triageResponses } = req.body;
     
-    // Normalize type to Capitalized Case (e.g., 'fire' -> 'Fire')
-    const normalizedType = type ? (type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()) : 'SOS';
+    if (!type) throw new Error('Alert type is required');
+
+    if (!type) throw new Error('Alert type is required');
+
+    // Normalize type (e.g., 'fire' -> 'Fire', but 'SOS' -> 'SOS')
+    let normalizedType = type.trim();
+    if (normalizedType.toUpperCase() === 'SOS') {
+      normalizedType = 'SOS';
+    } else {
+      normalizedType = normalizedType.charAt(0).toUpperCase() + normalizedType.slice(1).toLowerCase();
+    }
     
-    console.log(`🚨 NEW ALERT RECEIVED | State: ${state} | Type: ${normalizedType}`);
+    // Ensure state is provided (required by model)
+    const finalState = state || 'Gujarat';
+    
+    console.log(`🚨 ALERT ATTEMPT | State: ${finalState} | Type: ${normalizedType} | Payload: ${JSON.stringify(location)}`);
     let assignedDepartment = 'none';
 
     if (normalizedType === 'Fire') assignedDepartment = 'fire';
@@ -27,7 +38,7 @@ exports.createAlert = async (req, res) => {
       triageLevel,
       triageResponses,
       assignedDepartment,
-      state, 
+      state: finalState, 
       status: 'Pending'
     });
 
